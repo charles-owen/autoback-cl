@@ -67,9 +67,7 @@ Autoback.install = function () {
         }
     }
 
-    console.log(backStack);
-
-    document.body.onclick = (event) => {
+    document.body.addEventListener('click', (event) => {
         let clickedOn = event.target;
         if(clickedOn.tagName === 'A' &&
             clickedOn.classList.contains('cl-autoback')) {
@@ -79,7 +77,7 @@ Autoback.install = function () {
             backStack.push(clickedOn.href);
             window.sessionStorage.setItem('cl-autoback', JSON.stringify(backStack));
         }
-    }
+    });
 
 }
 

@@ -64,7 +64,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "15ec50f9b5581cb8b742";
+/******/ 	var hotCurrentHash = "c3f48ee176326dc8b0df";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -1565,9 +1565,7 @@ Autoback.install = function () {
     })();
   }
 
-  console.log(backStack);
-
-  document.body.onclick = function (event) {
+  document.body.addEventListener('click', function (event) {
     var clickedOn = event.target;
 
     if (clickedOn.tagName === 'A' && clickedOn.classList.contains('cl-autoback')) {
@@ -1579,7 +1577,7 @@ Autoback.install = function () {
       backStack.push(clickedOn.href);
       window.sessionStorage.setItem('cl-autoback', (0, _stringify.default)(backStack));
     }
-  };
+  });
 };
 
 function ready(fn) {
