@@ -3,6 +3,7 @@
   "version": "2.0.1",
   "description": "Simple autoback mechanism for web sites",
   "main": "dist/autoback-cl.js",
+  "module": "src/autoback.js",
   "private": false,
   "scripts": {
     "build:dev": "npx webpack --config webpack.dev.js",

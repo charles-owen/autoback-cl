@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAEE,iBAAE;EACA,SAAS,EAAE,MAAM;EACjB,gBAAgB,EAAE,0BAA0B;EAC5C,iBAAiB,EAAE,SAAS;EAC5B,eAAe,EAAE,UAAU;EAC3B,OAAO,EAAE,gBAAgB;EACzB,MAAM,EAAE,KAAK",
+"sources": ["autoback.scss"],
+"names": [],
+"file": "autoback.css"
+}

@@ -7,7 +7,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: {
-        autoback: './src/autoback.js'
+        autoback: './index.js'
     },
     devServer: {
         contentBase: './dist',

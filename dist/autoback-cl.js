@@ -64,7 +64,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "c3f48ee176326dc8b0df";
+/******/ 	var hotCurrentHash = "0e4b16ac78a2da02fef7";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -789,26 +789,26 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return hotCreateRequire("./src/autoback.js")(__webpack_require__.s = "./src/autoback.js");
+/******/ 	return hotCreateRequire("./index.js")(__webpack_require__.s = "./index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./node_modules/@babel/runtime/core-js/json/stringify.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@babel/runtime/core-js/json/stringify.js ***!
-  \***************************************************************/
+/***/ "../../node_modules/@babel/runtime/core-js/json/stringify.js":
+/*!*************************************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/@babel/runtime/core-js/json/stringify.js ***!
+  \*************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! core-js/library/fn/json/stringify */ "./node_modules/core-js/library/fn/json/stringify.js");
+module.exports = __webpack_require__(/*! core-js/library/fn/json/stringify */ "../../node_modules/core-js/library/fn/json/stringify.js");
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/interopRequireDefault.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/interopRequireDefault.js ***!
-  \**********************************************************************/
+/***/ "../../node_modules/@babel/runtime/helpers/interopRequireDefault.js":
+/*!********************************************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/@babel/runtime/helpers/interopRequireDefault.js ***!
+  \********************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -822,14 +822,14 @@ module.exports = _interopRequireDefault;
 
 /***/ }),
 
-/***/ "./node_modules/core-js/library/fn/json/stringify.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/core-js/library/fn/json/stringify.js ***!
-  \***********************************************************/
+/***/ "../../node_modules/core-js/library/fn/json/stringify.js":
+/*!*********************************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/core-js/library/fn/json/stringify.js ***!
+  \*********************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var core = __webpack_require__(/*! ../../modules/_core */ "./node_modules/core-js/library/modules/_core.js");
+var core = __webpack_require__(/*! ../../modules/_core */ "../../node_modules/core-js/library/modules/_core.js");
 var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
 module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
   return $JSON.stringify.apply($JSON, arguments);
@@ -838,10 +838,10 @@ module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
 
 /***/ }),
 
-/***/ "./node_modules/core-js/library/modules/_core.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/core-js/library/modules/_core.js ***!
-  \*******************************************************/
+/***/ "../../node_modules/core-js/library/modules/_core.js":
+/*!*****************************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/core-js/library/modules/_core.js ***!
+  \*****************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -851,15 +851,15 @@ if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss":
-/*!******************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/resolve-url-loader!./node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss ***!
-  \******************************************************************************************************************************************/
+/***/ "../../node_modules/css-loader/index.js!../../node_modules/resolve-url-loader/index.js!../../node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss":
+/*!************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/css-loader!C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/resolve-url-loader!C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var escape = __webpack_require__(/*! ../node_modules/css-loader/lib/url/escape.js */ "./node_modules/css-loader/lib/url/escape.js");
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+var escape = __webpack_require__(/*! ../../../node_modules/css-loader/lib/url/escape.js */ "../../node_modules/css-loader/lib/url/escape.js");
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "../../node_modules/css-loader/lib/css-base.js")(false);
 // imports
 
 
@@ -871,10 +871,10 @@ exports.push([module.i, "div.cl-autoback p {\n  font-size: 0.95em;\n  background
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/lib/css-base.js":
-/*!*************************************************!*\
-  !*** ./node_modules/css-loader/lib/css-base.js ***!
-  \*************************************************/
+/***/ "../../node_modules/css-loader/lib/css-base.js":
+/*!***********************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/css-loader/lib/css-base.js ***!
+  \***********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -958,10 +958,10 @@ function toComment(sourceMap) {
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/lib/url/escape.js":
-/*!***************************************************!*\
-  !*** ./node_modules/css-loader/lib/url/escape.js ***!
-  \***************************************************/
+/***/ "../../node_modules/css-loader/lib/url/escape.js":
+/*!*************************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/css-loader/lib/url/escape.js ***!
+  \*************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -985,10 +985,10 @@ module.exports = function escape(url) {
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/lib/addStyles.js":
-/*!****************************************************!*\
-  !*** ./node_modules/style-loader/lib/addStyles.js ***!
-  \****************************************************/
+/***/ "../../node_modules/style-loader/lib/addStyles.js":
+/*!**************************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/style-loader/lib/addStyles.js ***!
+  \**************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1055,7 +1055,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(/*! ./urls */ "./node_modules/style-loader/lib/urls.js");
+var	fixUrls = __webpack_require__(/*! ./urls */ "../../node_modules/style-loader/lib/urls.js");
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -1376,10 +1376,10 @@ function updateLink (link, options, obj) {
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/lib/urls.js":
-/*!***********************************************!*\
-  !*** ./node_modules/style-loader/lib/urls.js ***!
-  \***********************************************/
+/***/ "../../node_modules/style-loader/lib/urls.js":
+/*!*********************************************************************************************!*\
+  !*** C:/Users/charl/Documents/Classes/CSE335/web-new/node_modules/style-loader/lib/urls.js ***!
+  \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -1476,6 +1476,34 @@ module.exports = function (css) {
 
 /***/ }),
 
+/***/ "./index.js":
+/*!******************!*\
+  !*** ./index.js ***!
+  \******************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _autoback = __webpack_require__(/*! ./src/autoback */ "./src/autoback.js");
+
+/**
+ * @file
+ * Entry point for normal presentation of Autoback.
+ */
+function ready(fn) {
+  if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+ready(_autoback.Autoback.install);
+
+/***/ }),
+
 /***/ "./src/autoback.js":
 /*!*************************!*\
   !*** ./src/autoback.js ***!
@@ -1486,14 +1514,14 @@ module.exports = function (css) {
 "use strict";
 
 
-var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ "./node_modules/@babel/runtime/helpers/interopRequireDefault.js");
+var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ "../../node_modules/@babel/runtime/helpers/interopRequireDefault.js");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Autoback = void 0;
 
-var _stringify = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/core-js/json/stringify */ "./node_modules/@babel/runtime/core-js/json/stringify.js"));
+var _stringify = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/core-js/json/stringify */ "../../node_modules/@babel/runtime/core-js/json/stringify.js"));
 
 __webpack_require__(/*! ./autoback.scss */ "./src/autoback.scss");
 
@@ -1580,16 +1608,6 @@ Autoback.install = function () {
   });
 };
 
-function ready(fn) {
-  if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
-    fn();
-  } else {
-    document.addEventListener('DOMContentLoaded', fn);
-  }
-}
-
-ready(Autoback.install);
-
 /***/ }),
 
 /***/ "./src/autoback.scss":
@@ -1600,7 +1618,7 @@ ready(Autoback.install);
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/resolve-url-loader!../node_modules/sass-loader/lib/loader.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/index.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader!../../../node_modules/resolve-url-loader!../../../node_modules/sass-loader/lib/loader.js?sourceMap!./autoback.scss */ "../../node_modules/css-loader/index.js!../../node_modules/resolve-url-loader/index.js!../../node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -1614,13 +1632,13 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "../../node_modules/style-loader/lib/addStyles.js")(content, options);
 
 if(content.locals) module.exports = content.locals;
 
 if(true) {
-	module.hot.accept(/*! !../node_modules/css-loader!../node_modules/resolve-url-loader!../node_modules/sass-loader/lib/loader.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/index.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss", function() {
-		var newContent = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/resolve-url-loader!../node_modules/sass-loader/lib/loader.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/index.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss");
+	module.hot.accept(/*! !../../../node_modules/css-loader!../../../node_modules/resolve-url-loader!../../../node_modules/sass-loader/lib/loader.js?sourceMap!./autoback.scss */ "../../node_modules/css-loader/index.js!../../node_modules/resolve-url-loader/index.js!../../node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss", function() {
+		var newContent = __webpack_require__(/*! !../../../node_modules/css-loader!../../../node_modules/resolve-url-loader!../../../node_modules/sass-loader/lib/loader.js?sourceMap!./autoback.scss */ "../../node_modules/css-loader/index.js!../../node_modules/resolve-url-loader/index.js!../../node_modules/sass-loader/lib/loader.js?sourceMap!./src/autoback.scss");
 
 		if(typeof newContent === 'string') newContent = [[module.i, newContent, '']];
 
