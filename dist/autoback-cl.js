@@ -64,7 +64,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "423fe0946c9d1cdb604e";
+/******/ 	var hotCurrentHash = "f182ef074c19e99538a9";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -1546,13 +1546,19 @@ Autoback.install = function () {
     }
   } else {
     backStack = [];
+  }
+
+  function compareLocations(a, b) {
+    a = a.replace(/\/$/, '');
+    b = b.replace(/\/$/, '');
+    return a === b;
   } //
   // If the top of the stack is this page, we got here
   // through an autoback link.
   //
 
 
-  if (backStack.length < 2 || backStack.pop() !== window.location.href) {
+  if (backStack.length < 2 || !compareLocations(backStack.pop(), window.location.href)) {
     // Did not get here through an autoback link, so wipe the stack
     backStack = [];
   }
