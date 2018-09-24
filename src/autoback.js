@@ -24,11 +24,17 @@ Autoback.install = function () {
         backStack = [];
     }
 
+    function compareLocations(a, b) {
+        a = a.replace(/\/$/, '');
+        b = b.replace(/\/$/, '');
+        return a===b;
+    }
+
     //
     // If the top of the stack is this page, we got here
     // through an autoback link.
     //
-    if(backStack.length < 2 || backStack.pop() !== window.location.href) {
+    if(backStack.length < 2 || !compareLocations(backStack.pop(), window.location.href)) {
         // Did not get here through an autoback link, so wipe the stack
         backStack = [];
     }
