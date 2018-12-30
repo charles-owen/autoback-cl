@@ -11,12 +11,11 @@
 /******/
 /******/ 	// eslint-disable-next-line no-unused-vars
 /******/ 	function hotDownloadUpdateChunk(chunkId) {
-/******/ 		var head = document.getElementsByTagName("head")[0];
 /******/ 		var script = document.createElement("script");
 /******/ 		script.charset = "utf-8";
 /******/ 		script.src = __webpack_require__.p + "" + chunkId + "." + hotCurrentHash + ".hot-update.js";
-/******/ 		;
-/******/ 		head.appendChild(script);
+/******/ 		if (null) script.crossOrigin = null;
+/******/ 		document.head.appendChild(script);
 /******/ 	}
 /******/
 /******/ 	// eslint-disable-next-line no-unused-vars
@@ -64,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "f182ef074c19e99538a9";
+/******/ 	var hotCurrentHash = "c48a1c1df0600a4af41a";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -163,7 +162,7 @@
 /******/ 			// Module API
 /******/ 			active: true,
 /******/ 			accept: function(dep, callback) {
-/******/ 				if (typeof dep === "undefined") hot._selfAccepted = true;
+/******/ 				if (dep === undefined) hot._selfAccepted = true;
 /******/ 				else if (typeof dep === "function") hot._selfAccepted = dep;
 /******/ 				else if (typeof dep === "object")
 /******/ 					for (var i = 0; i < dep.length; i++)
@@ -171,7 +170,7 @@
 /******/ 				else hot._acceptedDependencies[dep] = callback || function() {};
 /******/ 			},
 /******/ 			decline: function(dep) {
-/******/ 				if (typeof dep === "undefined") hot._selfDeclined = true;
+/******/ 				if (dep === undefined) hot._selfDeclined = true;
 /******/ 				else if (typeof dep === "object")
 /******/ 					for (var i = 0; i < dep.length; i++)
 /******/ 						hot._declinedDependencies[dep[i]] = true;
@@ -798,18 +797,18 @@
 /*!******************!*\
   !*** ./index.js ***!
   \******************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-var _autoback = __webpack_require__(/*! ./src/autoback */ "./src/autoback.js");
-
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _src_autoback__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/autoback */ "./src/autoback.js");
 /**
  * @file
  * Entry point for normal presentation of Autoback.
  */
+
+
 function ready(fn) {
   if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
     fn();
@@ -818,64 +817,7 @@ function ready(fn) {
   }
 }
 
-ready(_autoback.Autoback.install);
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/core-js/json/stringify.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@babel/runtime/core-js/json/stringify.js ***!
-  \***************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! core-js/library/fn/json/stringify */ "./node_modules/core-js/library/fn/json/stringify.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/interopRequireDefault.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/interopRequireDefault.js ***!
-  \**********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : {
-    default: obj
-  };
-}
-
-module.exports = _interopRequireDefault;
-
-/***/ }),
-
-/***/ "./node_modules/core-js/library/fn/json/stringify.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/core-js/library/fn/json/stringify.js ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var core = __webpack_require__(/*! ../../modules/_core */ "./node_modules/core-js/library/modules/_core.js");
-var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
-module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
-  return $JSON.stringify.apply($JSON, arguments);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/core-js/library/modules/_core.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/core-js/library/modules/_core.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-var core = module.exports = { version: '2.5.7' };
-if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-
+ready(_src_autoback__WEBPACK_IMPORTED_MODULE_0__["Autoback"].install);
 
 /***/ }),
 
@@ -1508,29 +1450,19 @@ module.exports = function (css) {
 /*!*************************!*\
   !*** ./src/autoback.js ***!
   \*************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: Autoback */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ "./node_modules/@babel/runtime/helpers/interopRequireDefault.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Autoback = void 0;
-
-var _stringify = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/core-js/json/stringify */ "./node_modules/@babel/runtime/core-js/json/stringify.js"));
-
-__webpack_require__(/*! ./autoback.scss */ "./src/autoback.scss");
-
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Autoback", function() { return Autoback; });
+/* harmony import */ var _autoback_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autoback.scss */ "./src/autoback.scss");
+/* harmony import */ var _autoback_scss__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_autoback_scss__WEBPACK_IMPORTED_MODULE_0__);
 /**
  * @file
  */
-var Autoback = function Autoback() {};
 
-exports.Autoback = Autoback;
+var Autoback = function Autoback() {};
 
 Autoback.install = function () {
   //
@@ -1593,7 +1525,7 @@ Autoback.install = function () {
         a.onclick = function (event) {
           backStack.pop();
           backStack.push(top.href);
-          window.sessionStorage.setItem('cl-autoback', (0, _stringify.default)(backStack));
+          window.sessionStorage.setItem('cl-autoback', JSON.stringify(backStack));
         };
       }
     })();
@@ -1609,7 +1541,7 @@ Autoback.install = function () {
         href: window.location.href
       });
       backStack.push(clickedOn.href);
-      window.sessionStorage.setItem('cl-autoback', (0, _stringify.default)(backStack));
+      window.sessionStorage.setItem('cl-autoback', JSON.stringify(backStack));
     }
   });
 };
