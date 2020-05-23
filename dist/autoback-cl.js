@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "e5290d950fb439125d9a";
+/******/ 	var hotCurrentHash = "61244b3b0a848c25f5b4";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -156,6 +156,7 @@
 /******/ 			_declinedDependencies: {},
 /******/ 			_selfAccepted: false,
 /******/ 			_selfDeclined: false,
+/******/ 			_selfInvalidated: false,
 /******/ 			_disposeHandlers: [],
 /******/ 			_main: hotCurrentChildModule !== moduleId,
 /******/
@@ -185,6 +186,29 @@
 /******/ 			removeDisposeHandler: function(callback) {
 /******/ 				var idx = hot._disposeHandlers.indexOf(callback);
 /******/ 				if (idx >= 0) hot._disposeHandlers.splice(idx, 1);
+/******/ 			},
+/******/ 			invalidate: function() {
+/******/ 				this._selfInvalidated = true;
+/******/ 				switch (hotStatus) {
+/******/ 					case "idle":
+/******/ 						hotUpdate = {};
+/******/ 						hotUpdate[moduleId] = modules[moduleId];
+/******/ 						hotSetStatus("ready");
+/******/ 						break;
+/******/ 					case "ready":
+/******/ 						hotApplyInvalidatedModule(moduleId);
+/******/ 						break;
+/******/ 					case "prepare":
+/******/ 					case "check":
+/******/ 					case "dispose":
+/******/ 					case "apply":
+/******/ 						(hotQueuedInvalidatedModules =
+/******/ 							hotQueuedInvalidatedModules || []).push(moduleId);
+/******/ 						break;
+/******/ 					default:
+/******/ 						// ignore requests in error states
+/******/ 						break;
+/******/ 				}
 /******/ 			},
 /******/
 /******/ 			// Management API
@@ -227,7 +251,7 @@
 /******/ 	var hotDeferred;
 /******/
 /******/ 	// The update info
-/******/ 	var hotUpdate, hotUpdateNewHash;
+/******/ 	var hotUpdate, hotUpdateNewHash, hotQueuedInvalidatedModules;
 /******/
 /******/ 	function toModuleId(id) {
 /******/ 		var isNumber = +id + "" === id;
@@ -242,7 +266,7 @@
 /******/ 		hotSetStatus("check");
 /******/ 		return hotDownloadManifest(hotRequestTimeout).then(function(update) {
 /******/ 			if (!update) {
-/******/ 				hotSetStatus("idle");
+/******/ 				hotSetStatus(hotApplyInvalidatedModules() ? "ready" : "idle");
 /******/ 				return null;
 /******/ 			}
 /******/ 			hotRequestedFilesMap = {};
@@ -261,7 +285,6 @@
 /******/ 			var chunkId = "autoback";
 /******/ 			// eslint-disable-next-line no-lone-blocks
 /******/ 			{
-/******/ 				/*globals chunkId */
 /******/ 				hotEnsureUpdateChunk(chunkId);
 /******/ 			}
 /******/ 			if (
@@ -336,6 +359,11 @@
 /******/ 		if (hotStatus !== "ready")
 /******/ 			throw new Error("apply() is only allowed in ready status");
 /******/ 		options = options || {};
+/******/ 		return hotApplyInternal(options);
+/******/ 	}
+/******/
+/******/ 	function hotApplyInternal(options) {
+/******/ 		hotApplyInvalidatedModules();
 /******/
 /******/ 		var cb;
 /******/ 		var i;
@@ -358,7 +386,11 @@
 /******/ 				var moduleId = queueItem.id;
 /******/ 				var chain = queueItem.chain;
 /******/ 				module = installedModules[moduleId];
-/******/ 				if (!module || module.hot._selfAccepted) continue;
+/******/ 				if (
+/******/ 					!module ||
+/******/ 					(module.hot._selfAccepted && !module.hot._selfInvalidated)
+/******/ 				)
+/******/ 					continue;
 /******/ 				if (module.hot._selfDeclined) {
 /******/ 					return {
 /******/ 						type: "self-declined",
@@ -526,10 +558,13 @@
 /******/ 				installedModules[moduleId] &&
 /******/ 				installedModules[moduleId].hot._selfAccepted &&
 /******/ 				// removed self-accepted modules should not be required
-/******/ 				appliedUpdate[moduleId] !== warnUnexpectedRequire
+/******/ 				appliedUpdate[moduleId] !== warnUnexpectedRequire &&
+/******/ 				// when called invalidate self-accepting is not possible
+/******/ 				!installedModules[moduleId].hot._selfInvalidated
 /******/ 			) {
 /******/ 				outdatedSelfAcceptedModules.push({
 /******/ 					module: moduleId,
+/******/ 					parents: installedModules[moduleId].parents.slice(),
 /******/ 					errorHandler: installedModules[moduleId].hot._selfAccepted
 /******/ 				});
 /******/ 			}
@@ -602,7 +637,11 @@
 /******/ 		// Now in "apply" phase
 /******/ 		hotSetStatus("apply");
 /******/
-/******/ 		hotCurrentHash = hotUpdateNewHash;
+/******/ 		if (hotUpdateNewHash !== undefined) {
+/******/ 			hotCurrentHash = hotUpdateNewHash;
+/******/ 			hotUpdateNewHash = undefined;
+/******/ 		}
+/******/ 		hotUpdate = undefined;
 /******/
 /******/ 		// insert new code
 /******/ 		for (moduleId in appliedUpdate) {
@@ -655,7 +694,8 @@
 /******/ 		for (i = 0; i < outdatedSelfAcceptedModules.length; i++) {
 /******/ 			var item = outdatedSelfAcceptedModules[i];
 /******/ 			moduleId = item.module;
-/******/ 			hotCurrentParents = [moduleId];
+/******/ 			hotCurrentParents = item.parents;
+/******/ 			hotCurrentChildModule = moduleId;
 /******/ 			try {
 /******/ 				__webpack_require__(moduleId);
 /******/ 			} catch (err) {
@@ -697,10 +737,33 @@
 /******/ 			return Promise.reject(error);
 /******/ 		}
 /******/
+/******/ 		if (hotQueuedInvalidatedModules) {
+/******/ 			return hotApplyInternal(options).then(function(list) {
+/******/ 				outdatedModules.forEach(function(moduleId) {
+/******/ 					if (list.indexOf(moduleId) < 0) list.push(moduleId);
+/******/ 				});
+/******/ 				return list;
+/******/ 			});
+/******/ 		}
+/******/
 /******/ 		hotSetStatus("idle");
 /******/ 		return new Promise(function(resolve) {
 /******/ 			resolve(outdatedModules);
 /******/ 		});
+/******/ 	}
+/******/
+/******/ 	function hotApplyInvalidatedModules() {
+/******/ 		if (hotQueuedInvalidatedModules) {
+/******/ 			if (!hotUpdate) hotUpdate = {};
+/******/ 			hotQueuedInvalidatedModules.forEach(hotApplyInvalidatedModule);
+/******/ 			hotQueuedInvalidatedModules = undefined;
+/******/ 			return true;
+/******/ 		}
+/******/ 	}
+/******/
+/******/ 	function hotApplyInvalidatedModule(moduleId) {
+/******/ 		if (!Object.prototype.hasOwnProperty.call(hotUpdate, moduleId))
+/******/ 			hotUpdate[moduleId] = modules[moduleId];
 /******/ 	}
 /******/
 /******/ 	// The module cache
@@ -831,12 +894,16 @@ ready(_src_autoback__WEBPACK_IMPORTED_MODULE_0__["Autoback"].install);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Imports
-var getUrl = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
-var ___CSS_LOADER_URL___0___ = getUrl(__webpack_require__(/*! ./img/backarrow.png */ "./src/img/backarrow.png"));
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+var ___CSS_LOADER_GET_URL_IMPORT___ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
+var ___CSS_LOADER_URL_IMPORT_0___ = __webpack_require__(/*! ./img/backarrow.png */ "./src/img/backarrow.png");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+var ___CSS_LOADER_URL_REPLACEMENT_0___ = ___CSS_LOADER_GET_URL_IMPORT___(___CSS_LOADER_URL_IMPORT_0___);
 // Module
-exports.push([module.i, "div.cl-autoback p {\n  font-size: 0.95em;\n  background-image: url(" + ___CSS_LOADER_URL___0___ + ");\n  background-repeat: no-repeat;\n  background-size: auto 1.6em;\n  padding: 0.13em 0 0 2.6em;\n  height: 1.6em; }\n", ""]);
+exports.push([module.i, "div.cl-autoback p {\n  font-size: 0.95em;\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  background-repeat: no-repeat;\n  background-size: auto 1.6em;\n  padding: 0.13em 0 0 2.6em;\n  height: 1.6em; }\n", ""]);
+// Exports
+module.exports = exports;
 
 
 /***/ }),
@@ -865,7 +932,7 @@ module.exports = function (useSourceMap) {
       var content = cssWithMappingToString(item, useSourceMap);
 
       if (item[2]) {
-        return "@media ".concat(item[2], "{").concat(content, "}");
+        return "@media ".concat(item[2], " {").concat(content, "}");
       }
 
       return content;
@@ -874,7 +941,7 @@ module.exports = function (useSourceMap) {
   // eslint-disable-next-line func-names
 
 
-  list.i = function (modules, mediaQuery) {
+  list.i = function (modules, mediaQuery, dedupe) {
     if (typeof modules === 'string') {
       // eslint-disable-next-line no-param-reassign
       modules = [[null, modules, '']];
@@ -882,30 +949,34 @@ module.exports = function (useSourceMap) {
 
     var alreadyImportedModules = {};
 
-    for (var i = 0; i < this.length; i++) {
-      // eslint-disable-next-line prefer-destructuring
-      var id = this[i][0];
+    if (dedupe) {
+      for (var i = 0; i < this.length; i++) {
+        // eslint-disable-next-line prefer-destructuring
+        var id = this[i][0];
 
-      if (id != null) {
-        alreadyImportedModules[id] = true;
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
       }
     }
 
     for (var _i = 0; _i < modules.length; _i++) {
-      var item = modules[_i]; // skip already imported module
-      // this implementation is not 100% perfect for weird media query combinations
-      // when a module is imported multiple times with different media queries.
-      // I hope this will never occur (Hey this way we have smaller bundles)
+      var item = [].concat(modules[_i]);
 
-      if (item[0] == null || !alreadyImportedModules[item[0]]) {
-        if (mediaQuery && !item[2]) {
-          item[2] = mediaQuery;
-        } else if (mediaQuery) {
-          item[2] = "(".concat(item[2], ") and (").concat(mediaQuery, ")");
-        }
-
-        list.push(item);
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        // eslint-disable-next-line no-continue
+        continue;
       }
+
+      if (mediaQuery) {
+        if (!item[2]) {
+          item[2] = mediaQuery;
+        } else {
+          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
+        }
+      }
+
+      list.push(item);
     }
   };
 
@@ -924,7 +995,7 @@ function cssWithMappingToString(item, useSourceMap) {
   if (useSourceMap && typeof btoa === 'function') {
     var sourceMapping = toComment(cssMapping);
     var sourceURLs = cssMapping.sources.map(function (source) {
-      return "/*# sourceURL=".concat(cssMapping.sourceRoot).concat(source, " */");
+      return "/*# sourceURL=".concat(cssMapping.sourceRoot || '').concat(source, " */");
     });
     return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
   }
@@ -952,9 +1023,14 @@ function toComment(sourceMap) {
 "use strict";
 
 
-module.exports = function (url, needQuotes) {
-  // eslint-disable-next-line no-underscore-dangle, no-param-reassign
-  url = url.__esModule ? url.default : url;
+module.exports = function (url, options) {
+  if (!options) {
+    // eslint-disable-next-line no-param-reassign
+    options = {};
+  } // eslint-disable-next-line no-underscore-dangle, no-param-reassign
+
+
+  url = url && url.__esModule ? url.default : url;
 
   if (typeof url !== 'string') {
     return url;
@@ -964,11 +1040,16 @@ module.exports = function (url, needQuotes) {
   if (/^['"].*['"]$/.test(url)) {
     // eslint-disable-next-line no-param-reassign
     url = url.slice(1, -1);
+  }
+
+  if (options.hash) {
+    // eslint-disable-next-line no-param-reassign
+    url += options.hash;
   } // Should url be wrapped?
   // See https://drafts.csswg.org/css-values-3/#urls
 
 
-  if (/["'() \t\n]/.test(url) || needQuotes) {
+  if (/["'() \t\n]/.test(url) || options.needQuotes) {
     return "\"".concat(url.replace(/"/g, '\\"').replace(/\n/g, '\\n'), "\"");
   }
 
@@ -986,8 +1067,6 @@ module.exports = function (url, needQuotes) {
 
 "use strict";
 
-
-var stylesInDom = {};
 
 var isOldIE = function isOldIE() {
   var memo;
@@ -1029,80 +1108,69 @@ var getTarget = function getTarget() {
   };
 }();
 
-function listToStyles(list, options) {
-  var styles = [];
-  var newStyles = {};
+var stylesInDom = [];
+
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+
+  for (var i = 0; i < stylesInDom.length; i++) {
+    if (stylesInDom[i].identifier === identifier) {
+      result = i;
+      break;
+    }
+  }
+
+  return result;
+}
+
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
 
   for (var i = 0; i < list.length; i++) {
     var item = list[i];
     var id = options.base ? item[0] + options.base : item[0];
-    var css = item[1];
-    var media = item[2];
-    var sourceMap = item[3];
-    var part = {
-      css: css,
-      media: media,
-      sourceMap: sourceMap
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var index = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3]
     };
 
-    if (!newStyles[id]) {
-      styles.push(newStyles[id] = {
-        id: id,
-        parts: [part]
+    if (index !== -1) {
+      stylesInDom[index].references++;
+      stylesInDom[index].updater(obj);
+    } else {
+      stylesInDom.push({
+        identifier: identifier,
+        updater: addStyle(obj, options),
+        references: 1
       });
-    } else {
-      newStyles[id].parts.push(part);
     }
+
+    identifiers.push(identifier);
   }
 
-  return styles;
-}
-
-function addStylesToDom(styles, options) {
-  for (var i = 0; i < styles.length; i++) {
-    var item = styles[i];
-    var domStyle = stylesInDom[item.id];
-    var j = 0;
-
-    if (domStyle) {
-      domStyle.refs++;
-
-      for (; j < domStyle.parts.length; j++) {
-        domStyle.parts[j](item.parts[j]);
-      }
-
-      for (; j < item.parts.length; j++) {
-        domStyle.parts.push(addStyle(item.parts[j], options));
-      }
-    } else {
-      var parts = [];
-
-      for (; j < item.parts.length; j++) {
-        parts.push(addStyle(item.parts[j], options));
-      }
-
-      stylesInDom[item.id] = {
-        id: item.id,
-        refs: 1,
-        parts: parts
-      };
-    }
-  }
+  return identifiers;
 }
 
 function insertStyleElement(options) {
   var style = document.createElement('style');
+  var attributes = options.attributes || {};
 
-  if (typeof options.attributes.nonce === 'undefined') {
+  if (typeof attributes.nonce === 'undefined') {
     var nonce =  true ? __webpack_require__.nc : undefined;
 
     if (nonce) {
-      options.attributes.nonce = nonce;
+      attributes.nonce = nonce;
     }
   }
 
-  Object.keys(options.attributes).forEach(function (key) {
-    style.setAttribute(key, options.attributes[key]);
+  Object.keys(attributes).forEach(function (key) {
+    style.setAttribute(key, attributes[key]);
   });
 
   if (typeof options.insert === 'function') {
@@ -1140,7 +1208,7 @@ var replaceText = function replaceText() {
 }();
 
 function applyToSingletonTag(style, index, remove, obj) {
-  var css = remove ? '' : obj.css; // For old IE
+  var css = remove ? '' : obj.media ? "@media ".concat(obj.media, " {").concat(obj.css, "}") : obj.css; // For old IE
 
   /* istanbul ignore if  */
 
@@ -1169,6 +1237,8 @@ function applyToTag(style, options, obj) {
 
   if (media) {
     style.setAttribute('media', media);
+  } else {
+    style.removeAttribute('media');
   }
 
   if (sourceMap && btoa) {
@@ -1226,45 +1296,43 @@ function addStyle(obj, options) {
 }
 
 module.exports = function (list, options) {
-  options = options || {};
-  options.attributes = typeof options.attributes === 'object' ? options.attributes : {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+  options = options || {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
   // tags it will allow on a page
 
   if (!options.singleton && typeof options.singleton !== 'boolean') {
     options.singleton = isOldIE();
   }
 
-  var styles = listToStyles(list, options);
-  addStylesToDom(styles, options);
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
   return function update(newList) {
-    var mayRemove = [];
+    newList = newList || [];
 
-    for (var i = 0; i < styles.length; i++) {
-      var item = styles[i];
-      var domStyle = stylesInDom[item.id];
+    if (Object.prototype.toString.call(newList) !== '[object Array]') {
+      return;
+    }
 
-      if (domStyle) {
-        domStyle.refs--;
-        mayRemove.push(domStyle);
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDom[index].references--;
+    }
+
+    var newLastIdentifiers = modulesToDom(newList, options);
+
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+
+      var _index = getIndexByIdentifier(_identifier);
+
+      if (stylesInDom[_index].references === 0) {
+        stylesInDom[_index].updater();
+
+        stylesInDom.splice(_index, 1);
       }
     }
 
-    if (newList) {
-      var newStyles = listToStyles(newList, options);
-      addStylesToDom(newStyles, options);
-    }
-
-    for (var _i = 0; _i < mayRemove.length; _i++) {
-      var _domStyle = mayRemove[_i];
-
-      if (_domStyle.refs === 0) {
-        for (var j = 0; j < _domStyle.parts.length; j++) {
-          _domStyle.parts[j]();
-        }
-
-        delete stylesInDom[_domStyle.id];
-      }
-    }
+    lastIdentifiers = newLastIdentifiers;
   };
 };
 
@@ -1379,43 +1447,78 @@ Autoback.install = function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var content = __webpack_require__(/*! !../node_modules/css-loader/dist/cjs.js!../node_modules/resolve-url-loader!../node_modules/sass-loader/dist/cjs.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/dist/cjs.js?sourceMap!./src/autoback.scss");
+var api = __webpack_require__(/*! ../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+            var content = __webpack_require__(/*! !../node_modules/css-loader/dist/cjs.js!../node_modules/resolve-url-loader!../node_modules/sass-loader/dist/cjs.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/dist/cjs.js?sourceMap!./src/autoback.scss");
 
-if (typeof content === 'string') {
-  content = [[module.i, content, '']];
-}
+            content = content.__esModule ? content.default : content;
 
-var options = {}
+            if (typeof content === 'string') {
+              content = [[module.i, content, '']];
+            }
+
+var options = {};
 
 options.insert = "head";
 options.singleton = false;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js")(content, options);
+var update = api(content, options);
 
-if (content.locals) {
-  module.exports = content.locals;
-}
 
 if (true) {
-  if (!content.locals) {
+  if (!content.locals || module.hot.invalidate) {
+    var isEqualLocals = function isEqualLocals(a, b) {
+  if (!a && b || a && !b) {
+    return false;
+  }
+
+  var p;
+
+  for (p in a) {
+    if (a[p] !== b[p]) {
+      return false;
+    }
+  }
+
+  for (p in b) {
+    if (!a[p]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+    var oldLocals = content.locals;
+
     module.hot.accept(
       /*! !../node_modules/css-loader/dist/cjs.js!../node_modules/resolve-url-loader!../node_modules/sass-loader/dist/cjs.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/dist/cjs.js?sourceMap!./src/autoback.scss",
       function () {
-        var newContent = __webpack_require__(/*! !../node_modules/css-loader/dist/cjs.js!../node_modules/resolve-url-loader!../node_modules/sass-loader/dist/cjs.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/dist/cjs.js?sourceMap!./src/autoback.scss");
+        content = __webpack_require__(/*! !../node_modules/css-loader/dist/cjs.js!../node_modules/resolve-url-loader!../node_modules/sass-loader/dist/cjs.js?sourceMap!./autoback.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/resolve-url-loader/index.js!./node_modules/sass-loader/dist/cjs.js?sourceMap!./src/autoback.scss");
 
-        if (typeof newContent === 'string') {
-          newContent = [[module.i, newContent, '']];
-        }
-        
-        update(newContent);
+              content = content.__esModule ? content.default : content;
+
+              if (typeof content === 'string') {
+                content = [[module.i, content, '']];
+              }
+
+              if (!isEqualLocals(oldLocals, content.locals)) {
+                module.hot.invalidate();
+
+                return;
+              }
+
+              oldLocals = content.locals;
+
+              update(content);
       }
     )
   }
 
-  module.hot.dispose(function() { 
+  module.hot.dispose(function() {
     update();
   });
 }
+
+module.exports = content.locals || {};
 
 /***/ }),
 
@@ -1423,10 +1526,12 @@ if (true) {
 /*!*******************************!*\
   !*** ./src/img/backarrow.png ***!
   \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = "data:image/png;base64,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"
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("data:image/png;base64,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");
 
 /***/ })
 
