@@ -7,10 +7,6 @@ module.exports = {
     entry: {
         autoback: './index.js'
     },
-    devServer: {
-        contentBase: './dist',
-        hot: true
-    },
     plugins: [
         // new CleanWebpackPlugin(['dist']),
         new HtmlWebpackPlugin({
@@ -60,7 +56,12 @@ module.exports = {
                     'style-loader',
                     'css-loader',
                     'resolve-url-loader',
-                    'sass-loader?sourceMap'
+                    {
+                        loader: "sass-loader",
+                        options: {
+                            sourceMap: true,
+                        },
+                    }
                 ]
             },
             {
