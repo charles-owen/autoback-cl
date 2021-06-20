@@ -1,6 +1,6 @@
 {
   "name": "autoback-cl",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Simple autoback mechanism for web sites",
   "main": "dist/autoback-cl.js",
   "module": "src/autoback.js",
