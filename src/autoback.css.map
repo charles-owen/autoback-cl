@@ -1,7 +1,1 @@
-{
-"version": 3,
-"mappings": "AAEE,iBAAE;EACA,SAAS,EAAE,MAAM;EACjB,gBAAgB,EAAE,0BAA0B;EAC5C,iBAAiB,EAAE,SAAS;EAC5B,eAAe,EAAE,UAAU;EAC3B,OAAO,EAAE,gBAAgB;EACzB,MAAM,EAAE,KAAK",
-"sources": ["autoback.scss"],
-"names": [],
-"file": "autoback.css"
-}
+{"version":3,"sourceRoot":"","sources":["autoback.scss"],"names":[],"mappings":"AAEE,kBACE,gBACA,4CACA,4BACA,2BACA,wBACA","file":"autoback.css"}
